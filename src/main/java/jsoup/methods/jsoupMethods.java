@@ -13,7 +13,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -25,7 +24,7 @@ public class jsoupMethods {
 	private static final String boundaryDomain = "cengage";
 	
 	//initialUrl must be the exact scheme and different domain elements TODO: make final
-	private static String initialUrl = "https://www.google.com//";
+	private static String initialUrl = "https://www.cengage.com/";
 	
 	private static HashMap<String, HashMap<String, String>> mapOfUrlsAndInvalidLinks = new HashMap<String, HashMap<String, String>>();
 	
@@ -35,15 +34,17 @@ public class jsoupMethods {
 
 		manageLinks(initialUrl);
 		
-		if(mapOfUrlsAndInvalidLinks.size()>0) {
+		if(mapOfUrlsAndInvalidLinks.size() > 0) {
 			Iterator<Entry<String, HashMap<String, String>>> iter = mapOfUrlsAndInvalidLinks.entrySet().iterator();
 			while(iter.hasNext()) {
 				Entry<String, HashMap<String, String>> urlPlusMap = iter.next();
 				String primaryUrl = urlPlusMap.getKey();
 				Iterator<Entry<String, String>> invalidIter = urlPlusMap.getValue().entrySet().iterator();
 				while(invalidIter.hasNext()) {
-					String strUrlAndCode = invalidIter.next().toString();
-					System.out.println("Failure on page [".concat(primaryUrl).concat("] ---> ").concat(strUrlAndCode));					
+					String key = invalidIter.next().getKey();
+					String val = urlPlusMap.getValue().get(key);
+					System.out.println("Failure on page [".concat(primaryUrl).concat("] ---> ")
+							.concat(key).concat(" [").concat(val).concat("]"));
 				}
 			}
 			System.out.println("End of issues");
@@ -64,7 +65,7 @@ public class jsoupMethods {
 		if(links.isEmpty()) {
 			System.out.println("No links found on page [".concat(url).concat("]"));
 		}else {
-			HashMap<String, String> invalidLinks = validateLinks(url, links);
+			HashMap<String, String> invalidLinks = validateLinks(links);
 			if(invalidLinks.isEmpty()) {
 				System.out.println("No invalid links found on page [".concat(url).concat("]"));
 			}else {
@@ -89,7 +90,7 @@ public class jsoupMethods {
         return links;
     }
     
-    private static HashMap<String, String> validateLinks(String urlOfPage, ArrayList<String> listOfLinks) {
+    private static HashMap<String, String> validateLinks(ArrayList<String> listOfLinks) {
     	URL url = null;
     	HashMap<String, String> mapOfFailedLinks = new HashMap<String, String>();
     	Map<String, Integer> mapOfOccurrences = new HashMap<String, Integer>();
